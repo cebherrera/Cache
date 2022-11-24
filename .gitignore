@@ -1,0 +1,17 @@
+logs/
+vivado/
+tools/scripts/logs
+.Xil/
+./vivado*
+
+*.jou
+*.log
+*.str
+
+*.bin
+*.elf
+*.hex
+*.map
+
+*.vagrant
+*.swp

@@ -1,0 +1,10 @@
+if [[ -f /tools/Xilinx/Vivado/2021.2/settings64.sh ]]; then
+    echo "Vivado 2021.2 environment found"
+    echo "Run vivado to start GUI"
+    . /tools/Xilinx/Vivado/2021.2/settings64.sh
+elif [[ -f /tools/Xilinx/Vivado/2022.1/settings64.sh ]]; then
+    echo "Vivado 2022.2 environment found"
+    echo "Run vivado to start GUI"
+   . /tools/Xilinx/Vivado/2022.1/settings64.sh
+fi
+
