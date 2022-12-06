@@ -305,7 +305,6 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 			MEM_ACCESS: begin
 				mem_wstrb_MP = 0;
 				mem_valid_MP = 1;
-				mem_wdata_MP = mem_wdata;
 				if (mem_ready_MP) begin
 					// Se debe traer todo el bloque
 					data[index][(offsetMP)*32+:32] = mem_rdata_MP;
@@ -327,18 +326,18 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 			end
 			MEM_WAIT: begin
 				next_state = MEM_ACCESS;
+				mem_addr_MP = w_mem_address & (32'hFFFFFFFF<<(OFFSET_SIZE));
+				offsetMP = 0;
 			end
 		// COMIENZA ESTADO WRITE_BACK
 			WRITE_BACK: begin
 				mem_valid_MP = 1; 
 				mem_wstrb_MP = 4'hF;
-				mem_wdata_MP = data[offsetMP][index];
+				mem_wdata_MP = data[index][(offsetMP)*32+:32];
 				if (mem_ready_MP) begin
 					mem_addr_MP = mem_addr_MP + 4;
 					offsetMP = offsetMP + 1;
 					if (offsetMP == BLOCK_WORDS) begin
-						mem_addr_MP = w_mem_address & (32'hFFFFFFFF<<(OFFSET_SIZE));
-						offsetMP = 0;
 						next_state = MEM_WAIT;
 					end
 				end
@@ -411,15 +410,12 @@ module mem_prin (
 	end else begin
 		always @(posedge clk) begin
 			m_read_en <= 0;
-			mem_ready <= mem_valid && !mem_ready && m_read_en;
-
-			m_read_data <= memory[mem_addr >> 2];
-			mem_rdata <= m_read_data;
+			mem_ready <= 0;
 
 			out_byte_en <= 0;
 
 			if (mem_valid) begin
-				if (mem_wstrb) delay <= 4'b1100;
+				if (mem_wstrb) delay <= 4'b1110;
 				else delay <= 4'b0111;
 				if (delay_cnt == delay) begin
 					delay_cnt <= 0;
@@ -445,12 +441,10 @@ module mem_prin (
 				end
 				// Escritura a memoria
 				mem_valid && !mem_ready && |mem_wstrb && (mem_addr >> 2) < MEM_SIZE: begin
-					if ((mem_addr >> 2) > 4096) begin
 						if (mem_wstrb[0]) memory[mem_addr >> 2][ 7: 0] <= mem_wdata[ 7: 0];
 						if (mem_wstrb[1]) memory[mem_addr >> 2][15: 8] <= mem_wdata[15: 8];
 						if (mem_wstrb[2]) memory[mem_addr >> 2][23:16] <= mem_wdata[23:16];
 						if (mem_wstrb[3]) memory[mem_addr >> 2][31:24] <= mem_wdata[31:24];
-					end
 					mem_ready <= 1;
 				end
 				// Leds
