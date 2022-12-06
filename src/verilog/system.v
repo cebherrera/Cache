@@ -204,6 +204,7 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
     parameter WRITE = 4;
     parameter MEM_ACCESS  = 8;
     parameter WRITE_BACK  = 16;
+	parameter MEM_WAIT = 32;
 
 	initial next_state = IDLE;
 	initial w_mem_address = 1;
@@ -248,8 +249,10 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 					mem_rdata = data[index][(offset>>2)*32+:32]; // NOTA: El byte offset se pasa											 
 					next_state     = IDLE;						      // a word offset
 					mem_ready = 1;
+					valid[index] = 1;
 				end else begin
 					// MISS
+					valid[index] = 0;
 					mem_ready = 0;
 					offsetMP  = 0;
 					miss_flag = 1;
@@ -276,10 +279,12 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 					end
 					dirty[index] = 1;
 					data[index][(offset>>2)*32+:32] = mem_wdata; // NOTA: El byte offset se pasa		
-					next_state     = IDLE;						      // a word offset
+					next_state     = IDLE;
+					valid[index] = 1;						      // a word offset
 					mem_ready = 1;						    
 				end else begin									   
 					// MISS
+					valid[index] = 0;
 					mem_ready = 0;
 					offsetMP  = 0;
 					miss_flag = 1;
@@ -320,6 +325,9 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 					end
 				end 
 			end
+			MEM_WAIT: begin
+				next_state = MEM_ACCESS;
+			end
 		// COMIENZA ESTADO WRITE_BACK
 			WRITE_BACK: begin
 				mem_valid_MP = 1; 
@@ -329,16 +337,9 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 					mem_addr_MP = mem_addr_MP + 4;
 					offsetMP = offsetMP + 1;
 					if (offsetMP == BLOCK_WORDS) begin
-						//valid[index] <= 1;  
-						//dirty[index] <= 0; 
-						//tag  [index] <= tag_w;
-						//mem_valid_MP <= 0;
-						//if (|mem_wstrb) begin
-						//	state <= WRITE;
-						//end 
-						//else if (!mem_wstrb) begin
-						//	state <= READ;
-						next_state = MEM_ACCESS;
+						mem_addr_MP = w_mem_address & (32'hFFFFFFFF<<(OFFSET_SIZE));
+						offsetMP = 0;
+						next_state = MEM_WAIT;
 					end
 				end
 			end
@@ -444,11 +445,13 @@ module mem_prin (
 				end
 				// Escritura a memoria
 				mem_valid && !mem_ready && |mem_wstrb && (mem_addr >> 2) < MEM_SIZE: begin
+					if ((mem_addr >> 2) > 4096) begin
 						if (mem_wstrb[0]) memory[mem_addr >> 2][ 7: 0] <= mem_wdata[ 7: 0];
 						if (mem_wstrb[1]) memory[mem_addr >> 2][15: 8] <= mem_wdata[15: 8];
 						if (mem_wstrb[2]) memory[mem_addr >> 2][23:16] <= mem_wdata[23:16];
 						if (mem_wstrb[3]) memory[mem_addr >> 2][31:24] <= mem_wdata[31:24];
-						mem_ready <= 1;
+					end
+					mem_ready <= 1;
 				end
 				// Leds
 				mem_valid && !mem_ready && |mem_wstrb && mem_addr == 32'h1000_0000: begin
