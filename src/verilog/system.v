@@ -115,41 +115,41 @@ endmodule
 module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8, parameter ASOCIATIVITY = 2
 )(						// CACHE SIZE Y BLOCK_BYTES EN BYTES
 	// Señales con PIRCOV
-	input 			  clk, resetn,
+	input 		  clk, resetn,
 	output reg [31:0] num_to_screen,
 	output reg [7:0 ] out_byte,
 	output reg        out_byte_en,    mem_ready, mem_ready_delay,
-	input 			  mem_valid,      mem_instr,
+	input 	          mem_valid,      mem_instr,
 	input      [31:0] mem_addr,       mem_wdata,
 	input      [3:0 ] mem_wstrb,      mem_la_wstrb,
 	output reg [31:0] mem_rdata,
 	input      [31:0] mem_la_addr,    mem_la_wdata,
-	input 			  mem_la_read,    mem_la_write,
+	input 	          mem_la_read,    mem_la_write,
 
 
 	// Señales con MEM_PRN
 	input             mem_ready_MP,   mem_ready_delay_MP,
-	output reg 		  mem_valid_MP,   mem_instr_MP,
+	output reg        mem_valid_MP,   mem_instr_MP,
 	output reg [31:0] mem_addr_MP,    mem_wdata_MP,
 	output reg [3:0 ] mem_wstrb_MP,   mem_la_wstrb_MP,
 	input      [31:0] mem_rdata_MP, 
 	output reg [31:0] mem_la_addr_MP, mem_la_wdata_MP,
-	output reg 		  mem_la_read_MP, mem_la_write_MP
+	output reg        mem_la_read_MP, mem_la_write_MP
 );
 	// Definicion de parametros del cache
 	parameter WORD_BYTES  = 4; // BYTES POR PALABRA
-    parameter WORD_BITS   = 8*WORD_BYTES; // BITS POR PALABRA
+        parameter WORD_BITS   = 8*WORD_BYTES; // BITS POR PALABRA
 
 	parameter ADDR_BITS   = 32; // BITS POR ADDRESS
 
 	parameter BLOCK_WORDS = BLOCK_BYTES/WORD_BYTES; // PALABRAS POR BLOQUE
 	parameter BLOCK_BITS  = 8*BLOCK_BYTES; // BITS POR BLOQUE
 
-    parameter NUM_BLOCK   = CACHE_SIZE/BLOCK_BYTES; // NUMERO DE BLOQUES
+        parameter NUM_BLOCK   = CACHE_SIZE/BLOCK_BYTES; // NUMERO DE BLOQUES
 	parameter NUM_FILES   = NUM_BLOCK/ASOCIATIVITY;
 	
 	// Definicion del tamaño de señales
-    parameter OFFSET_SIZE = $clog2(BLOCK_BYTES); // OFFSET PARA BYTES POR BLOQUE
+        parameter OFFSET_SIZE = $clog2(BLOCK_BYTES); // OFFSET PARA BYTES POR BLOQUE
 	parameter INDEX_SIZE  = $clog2(NUM_BLOCK  ); // INDICE POR BLOQUE
 	parameter TAG_SIZE    = 32-INDEX_SIZE-OFFSET_SIZE; // TAG
     
@@ -169,12 +169,12 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 
 	// Asignacion de tag, offset, index
 	wire [TAG_SIZE-1:0   ] tag_w;
-    wire [INDEX_SIZE-1:0 ] index;
-    wire [OFFSET_SIZE-1:0] offset;
+        wire [INDEX_SIZE-1:0 ] index;
+        wire [OFFSET_SIZE-1:0] offset;
 
 	assign offset = w_mem_address[OFFSET_SIZE-1:0                     ];
-    assign index  = w_mem_address[INDEX_SIZE+OFFSET_SIZE-1:OFFSET_SIZE];
-    assign tag_w  = w_mem_address[ADDR_BITS-1:INDEX_SIZE+OFFSET_SIZE  ];
+        assign index  = w_mem_address[INDEX_SIZE+OFFSET_SIZE-1:OFFSET_SIZE];
+        assign tag_w  = w_mem_address[ADDR_BITS-1:INDEX_SIZE+OFFSET_SIZE  ];
 
 	// Enteros para los for loop
 	integer i,j; 
@@ -200,10 +200,10 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 	reg [7:0] state, next_state;
 
 	parameter IDLE        = 1;
-    parameter READ        = 2;
-    parameter WRITE       = 4;
-    parameter MEM_ACCESS  = 8;
-    parameter WRITE_BACK  = 16;
+        parameter READ        = 2;
+        parameter WRITE       = 4;
+        parameter MEM_ACCESS  = 8;
+        parameter WRITE_BACK  = 16;
 	parameter MEM_WAIT    = 32;
 
 	initial next_state    = IDLE;
@@ -213,9 +213,9 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
         if (resetn == 0) begin
             hit_flag  <= 0;
         end
-		else begin
-			state     <= next_state;
-		end
+	else begin
+	    state     <= next_state;
+	   end
 	end
 
 	always @(*) begin
