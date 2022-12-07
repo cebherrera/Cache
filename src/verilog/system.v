@@ -10,104 +10,104 @@ module system (
 	output [7:0]     anodos, catodos
 );
 
-	wire clk_div;
+	wire        clk_div;
 	wire [31:0] num_to_screen;
 
 	// Interfaz cache Pircov
-	wire mem_valid;
-	wire mem_instr;
-	wire mem_ready;
-	wire mem_ready_delay;
+	wire        mem_valid;
+	wire        mem_instr;
+	wire        mem_ready;
+	wire        mem_ready_delay;
 	wire [31:0] mem_addr;
 	wire [31:0] mem_wdata;
-	wire [3:0]  mem_wstrb;
+	wire [3:0 ] mem_wstrb;
 	wire [31:0] mem_rdata;
 
-	wire mem_la_read;
-	wire mem_la_write;
+	wire        mem_la_read;
+	wire        mem_la_write;
 	wire [31:0] mem_la_addr;
 	wire [31:0] mem_la_wdata;
-	wire [3:0]  mem_la_wstrb;
+	wire [3:0 ] mem_la_wstrb;
 
 	// Interfaz cache MP
-	wire mem_valid_MP;
-	wire mem_ready_MP;
+	wire        mem_valid_MP;
+	wire        mem_ready_MP;
 	wire [31:0] mem_addr_MP;
 	wire [31:0] mem_wdata_MP;
-	wire [3:0] mem_wstrb_MP;
+	wire [3:0 ] mem_wstrb_MP;
 	wire [31:0] mem_rdata_MP;
 
 	picorv32 picorv32_core (
-		.clk         (clk            ),
-		.resetn      (resetn         ),
-		.trap        (trap           ),
-		.mem_valid   (mem_valid      ),
-		.mem_instr   (mem_instr      ),
-		.mem_ready   (mem_ready),
-		.mem_addr    (mem_addr       ),
-		.mem_wdata   (mem_wdata      ),
-		.mem_wstrb   (mem_wstrb      ),
-		.mem_rdata   (mem_rdata      ),
-		.mem_la_read (mem_la_read    ),
-		.mem_la_write(mem_la_write   ),
-		.mem_la_addr (mem_la_addr    ),
-		.mem_la_wdata(mem_la_wdata   ),
-		.mem_la_wstrb(mem_la_wstrb   )
+		.clk            (clk            ),
+		.resetn         (resetn         ),
+		.trap           (trap           ),
+		.mem_valid      (mem_valid      ),
+		.mem_instr      (mem_instr      ),
+		.mem_ready      (mem_ready      ),
+		.mem_addr       (mem_addr       ),
+		.mem_wdata      (mem_wdata      ),
+		.mem_wstrb      (mem_wstrb      ),
+		.mem_rdata      (mem_rdata      ),
+		.mem_la_read    (mem_la_read    ),
+		.mem_la_write   (mem_la_write   ),
+		.mem_la_addr    (mem_la_addr    ),
+		.mem_la_wdata   (mem_la_wdata   ),
+		.mem_la_wstrb   (mem_la_wstrb   )
 	);
 
-	cache_directo cache ( .clk(clk), .resetn(resetn),
+	cache_directo cache (.clk(clk), .resetn(resetn),
 		// Pircov
-		.mem_valid(mem_valid),
-		.mem_instr(mem_instr),
-		.mem_ready(mem_ready),
-		.mem_addr (mem_addr ),
-		.mem_wdata(mem_wdata),
-		.mem_wstrb(mem_wstrb),
-		.mem_rdata(mem_rdata),
+		.mem_valid      (mem_valid      ),
+		.mem_instr      (mem_instr      ),
+		.mem_ready      (mem_ready      ),
+		.mem_addr       (mem_addr       ),
+		.mem_wdata      (mem_wdata      ),
+		.mem_wstrb      (mem_wstrb      ),
+		.mem_rdata      (mem_rdata      ),
 		// MP
-		.mem_wdata_MP(mem_wdata_MP),
-		.mem_wstrb_MP(mem_wstrb_MP),
-		.mem_rdata_MP(mem_rdata_MP),
-		.mem_valid_MP(mem_valid_MP),
-		.mem_ready_MP(mem_ready_delay),
-		.mem_addr_MP(mem_addr_MP ),
-		.mem_instr_MP(mem_instr_MP),
+		.mem_wdata_MP   (mem_wdata_MP   ),
+		.mem_wstrb_MP   (mem_wstrb_MP   ),
+		.mem_rdata_MP   (mem_rdata_MP   ),
+		.mem_valid_MP   (mem_valid_MP   ),
+		.mem_ready_MP   (mem_ready_delay),
+		.mem_addr_MP    (mem_addr_MP    ),
+		.mem_instr_MP   (mem_instr_MP   ),
 		.out_byte       (out_byte       ),
 		.out_byte_en    (out_byte_en    ),
-		.num_to_screen  (num_to_screen )
+		.num_to_screen  (num_to_screen  )
 	);
 
 	mem_prin principal (
 		.clk            (clk            ),
 		.resetn         (resetn         ),
-		.mem_valid      (mem_valid_MP      ),
-		.mem_instr      (mem_instr_MP      ),
-		.mem_ready      (mem_ready_MP      ),
+		.mem_valid      (mem_valid_MP   ),
+		.mem_instr      (mem_instr_MP   ),
+		.mem_ready      (mem_ready_MP   ),
 		.mem_ready_delay(mem_ready_delay),
-		.mem_addr       (mem_addr_MP       ),
-		.mem_wdata      (mem_wdata_MP      ),
-		.mem_wstrb      (mem_wstrb_MP      ),
-		.mem_rdata      (mem_rdata_MP      ),
-		.mem_la_read    (mem_la_read_MP    ),
-		.mem_la_write   (mem_la_write_MP   ),
+		.mem_addr       (mem_addr_MP    ),
+		.mem_wdata      (mem_wdata_MP   ),
+		.mem_wstrb      (mem_wstrb_MP   ),
+		.mem_rdata      (mem_rdata_MP   ),
+		.mem_la_read    (mem_la_read_MP ),
+		.mem_la_write   (mem_la_write_MP),
 		.mem_la_addr    (mem_la_addr    ),
 		.mem_la_wdata   (mem_la_wdata   ),
 		.mem_la_wstrb   (mem_la_wstrb   )
 	);
 
 	clock_divider clkk (
-		.clk         (clk         ),
-		.resetn      (resetn      ),
-		.clk_div     (clk_div     )
+		.clk            (clk            ),
+		.resetn         (resetn         ),
+		.clk_div        (clk_div        )
 	);
 
 	seven_segment_hex screen (
-		.sw0          (sw0          ),
-		.clk          (clk_div      ),
-		.resetn       (resetn       ),
-		.num_to_screen(num_to_screen),
-		.catodos      (catodos      ),
-		.anodos       (anodos       )
+		.sw0           (sw0             ),
+		.clk           (clk_div         ),
+		.resetn        (resetn          ),
+		.num_to_screen (num_to_screen   ),
+		.catodos       (catodos         ),
+		.anodos        (anodos          )
 	);
 
 endmodule
@@ -118,39 +118,39 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 	input 			  clk, resetn,
 	output reg [31:0] num_to_screen,
 	output reg [7:0 ] out_byte,
-	output reg        out_byte_en, mem_ready, mem_ready_delay,
-	input 			  mem_valid, mem_instr,
-	input      [31:0] mem_addr, mem_wdata,
-	input      [3:0 ] mem_wstrb, mem_la_wstrb,
+	output reg        out_byte_en,    mem_ready, mem_ready_delay,
+	input 			  mem_valid,      mem_instr,
+	input      [31:0] mem_addr,       mem_wdata,
+	input      [3:0 ] mem_wstrb,      mem_la_wstrb,
 	output reg [31:0] mem_rdata,
-	input      [31:0] mem_la_addr, mem_la_wdata,
-	input 			  mem_la_read, mem_la_write,
+	input      [31:0] mem_la_addr,    mem_la_wdata,
+	input 			  mem_la_read,    mem_la_write,
 
 
 	// Señales con MEM_PRN
-	input             mem_ready_MP, mem_ready_delay_MP,
-	output reg 		  mem_valid_MP, mem_instr_MP,
-	output reg [31:0] mem_addr_MP, mem_wdata_MP,
-	output reg [3:0 ] mem_wstrb_MP, mem_la_wstrb_MP,
+	input             mem_ready_MP,   mem_ready_delay_MP,
+	output reg 		  mem_valid_MP,   mem_instr_MP,
+	output reg [31:0] mem_addr_MP,    mem_wdata_MP,
+	output reg [3:0 ] mem_wstrb_MP,   mem_la_wstrb_MP,
 	input      [31:0] mem_rdata_MP, 
 	output reg [31:0] mem_la_addr_MP, mem_la_wdata_MP,
 	output reg 		  mem_la_read_MP, mem_la_write_MP
 );
 	// Definicion de parametros del cache
-	parameter WORD_BYTES = 4; // BYTES POR PALABRA
-    parameter WORD_BITS  = 8*WORD_BYTES; // BITS POR PALABRA
+	parameter WORD_BYTES  = 4; // BYTES POR PALABRA
+    parameter WORD_BITS   = 8*WORD_BYTES; // BITS POR PALABRA
 
-	parameter ADDR_BITS = 32; // BITS POR ADDRESS
+	parameter ADDR_BITS   = 32; // BITS POR ADDRESS
 
 	parameter BLOCK_WORDS = BLOCK_BYTES/WORD_BYTES; // PALABRAS POR BLOQUE
 	parameter BLOCK_BITS  = 8*BLOCK_BYTES; // BITS POR BLOQUE
 
-    parameter NUM_BLOCK  = CACHE_SIZE/BLOCK_BYTES; // NUMERO DE BLOQUES
-	parameter NUM_FILES = NUM_BLOCK/ASOCIATIVITY;
+    parameter NUM_BLOCK   = CACHE_SIZE/BLOCK_BYTES; // NUMERO DE BLOQUES
+	parameter NUM_FILES   = NUM_BLOCK/ASOCIATIVITY;
 	
 	// Definicion del tamaño de señales
     parameter OFFSET_SIZE = $clog2(BLOCK_BYTES); // OFFSET PARA BYTES POR BLOQUE
-	parameter INDEX_SIZE  = $clog2(NUM_BLOCK); // INDICE POR BLOQUE
+	parameter INDEX_SIZE  = $clog2(NUM_BLOCK  ); // INDICE POR BLOQUE
 	parameter TAG_SIZE    = 32-INDEX_SIZE-OFFSET_SIZE; // TAG
     
 	// Arreglo de la caches
@@ -160,11 +160,11 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 	reg [BLOCK_BITS-1:0]    data  [0:NUM_BLOCK-1];
 
 	// Contadores hit y miss, asi como sus banderas
-	reg hit_flag = 0;
-	reg miss_flag = 0;
-	reg [31:0] hits = 0;
-	reg [31:0] miss = 0;
-	reg [31:0] accesos = 0;
+	reg        hit_flag  = 0;
+	reg        miss_flag = 0;
+	reg [31:0] hits      = 0;
+	reg [31:0] miss      = 0;
+	reg [31:0] accesos   = 0;
 	reg [31:0] w_mem_address;
 
 	// Asignacion de tag, offset, index
@@ -174,7 +174,7 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 
 	assign offset = w_mem_address[OFFSET_SIZE-1:0                     ];
     assign index  = w_mem_address[INDEX_SIZE+OFFSET_SIZE-1:OFFSET_SIZE];
-    assign tag_w    = w_mem_address[ADDR_BITS-1:INDEX_SIZE+OFFSET_SIZE  ];
+    assign tag_w  = w_mem_address[ADDR_BITS-1:INDEX_SIZE+OFFSET_SIZE  ];
 
 	// Enteros para los for loop
 	integer i,j; 
@@ -183,7 +183,7 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 		hit_flag  <= 0;
 		miss_flag <= 0;
 		hits      <= 0;
-		miss    <= 0;
+		miss      <= 0;
 		accesos   <= 0;
 		state     <= IDLE;
 		for (i = 0; i < NUM_BLOCK; i = i + 1) begin
@@ -199,14 +199,14 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 	// Definicion de estados ONE-HOT
 	reg [7:0] state, next_state;
 
-	parameter IDLE  = 1;
-    parameter READ  = 2;
-    parameter WRITE = 4;
+	parameter IDLE        = 1;
+    parameter READ        = 2;
+    parameter WRITE       = 4;
     parameter MEM_ACCESS  = 8;
     parameter WRITE_BACK  = 16;
-	parameter MEM_WAIT = 32;
+	parameter MEM_WAIT    = 32;
 
-	initial next_state = IDLE;
+	initial next_state    = IDLE;
 	initial w_mem_address = 1;
 
 	always @(posedge clk) begin
@@ -214,7 +214,7 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
             hit_flag  <= 0;
         end
 		else begin
-			state <= next_state;
+			state     <= next_state;
 		end
 	end
 
@@ -223,10 +223,10 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 		// COMIENZA ESTADO IDLE
 			IDLE: begin
 				if (mem_addr == 32'h1000_0000) begin
-					out_byte_en = 1;
-					out_byte = mem_wdata;
+					out_byte_en   = 1;
+					out_byte      = mem_wdata;
 					num_to_screen = mem_wdata;
-					mem_ready = 1;
+					mem_ready     = 1;
 				end
 				else begin
 					hit_flag  = 0;
@@ -251,29 +251,29 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 				if ((tag[index] == tag_w) && valid[index]) begin 
 					if (!miss_flag) begin
 						hit_flag  = 1;
-						hits = hits + 1;
-						accesos   = accesos   + 1;
+						hits      = hits    + 1;
+						accesos   = accesos + 1;
 					end
 					mem_rdata = data[index][(offset>>2)*32+:32]; // NOTA: El byte offset se pasa											 
-					next_state     = IDLE;						      // a word offset
-					mem_ready = 1;
-					valid[index] = 1;
+					next_state    = IDLE;						      // a word offset
+					mem_ready     = 1;
+					valid[index]  = 1;
 				end else begin
 					// MISS
-					valid[index] = 0;
-					mem_ready = 0;
-					offsetMP  = 0;
-					miss_flag = 1;
-					miss      = miss + 1;
-					accesos   = accesos   + 1;
+					valid[index]  = 0;
+					mem_ready     = 0;
+					offsetMP      = 0;
+					miss_flag     = 1;
+					miss          = miss    + 1;
+					accesos       = accesos + 1;
 					// Se revisa el dirty bit
 					if (dirty[index] == 0) begin
 						mem_addr_MP = w_mem_address & (32'hFFFFFFFF<<(OFFSET_SIZE)); // Se eliminan los offset bit 
-						next_state = MEM_ACCESS;  							  						// de la direccion
+						next_state  = MEM_ACCESS;  							  						// de la direccion
 					end 													 						// Esto nos deja iniciar en la
 					else begin  	
 						mem_addr_MP = {tag[index], index, offset} & (32'hFFFFFFFF<<(OFFSET_SIZE));	// primera palabra en MP
-						next_state = WRITE_BACK;
+						next_state  = WRITE_BACK;
 					end
 				end
 			end
@@ -281,31 +281,31 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 			WRITE: begin
 				if ((tag[index] == tag_w) && valid[index]) begin
 					if (!miss_flag) begin
-						hit_flag     = 1;
-						hits    = hits + 1;
-						accesos      = accesos   + 1;
+						hit_flag    = 1;
+						hits        = hits    + 1;
+						accesos     = accesos + 1;
 					end
-					dirty[index] = 1;
-					data[index][(offset>>2)*32+:32] = mem_wdata; // NOTA: El byte offset se pasa		
-					next_state     = IDLE;
-					valid[index] = 1;						      // a word offset
-					mem_ready = 1;						    
+					dirty[index]    = 1;
+					data [index][(offset>>2)*32+:32] = mem_wdata; // NOTA: El byte offset se pasa		
+					next_state      = IDLE;
+					valid[index]    = 1;						      // a word offset
+					mem_ready       = 1;						    
 				end else begin									   
 					// MISS
 					valid[index] = 0;
-					mem_ready = 0;
-					offsetMP  = 0;
-					miss_flag = 1;
-					miss      = miss + 1;
-					accesos   = accesos   + 1;
+					mem_ready    = 0;
+					offsetMP     = 0;
+					miss_flag    = 1;
+					miss         = miss    + 1;
+					accesos      = accesos + 1;
 					// Se revisa el dirty bit
 					if (dirty[index] == 0) begin
 						mem_addr_MP = w_mem_address & (32'hFFFFFFFF<<(OFFSET_SIZE)); // Se eliminan los offset bit 
-						next_state = MEM_ACCESS;  								  // de la direccion
+						next_state  = MEM_ACCESS;  								  // de la direccion
 					end 													 // Esto nos deja iniciar en la
 					else begin  	
 						mem_addr_MP = {tag[index], index, offset} & (32'hFFFFFFFF<<(OFFSET_SIZE));	// primera palabra en MP
-						next_state = WRITE_BACK;
+						next_state  = WRITE_BACK;
 					end
 				end
 			end
@@ -316,7 +316,7 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 				if (mem_ready_MP) begin
 					// Se debe traer todo el bloque
 					data[index][(offsetMP)*32+:32] = mem_rdata_MP;
-					offsetMP = offsetMP + 1;
+					offsetMP    = offsetMP    + 1;
 					mem_addr_MP = mem_addr_MP + 4;
 					if (offsetMP == BLOCK_WORDS) begin
 						valid[index] = 1;  
@@ -333,9 +333,9 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 				end 
 			end
 			MEM_WAIT: begin
-				next_state = MEM_ACCESS;
+				next_state  = MEM_ACCESS;
 				mem_addr_MP = w_mem_address & (32'hFFFFFFFF<<(OFFSET_SIZE));
-				offsetMP = 0;
+				offsetMP    = 0;
 			end
 		// COMIENZA ESTADO WRITE_BACK
 			WRITE_BACK: begin
@@ -344,7 +344,7 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 				mem_wdata_MP = data[index][(offsetMP)*32+:32];
 				if (mem_ready_MP) begin
 					mem_addr_MP = mem_addr_MP + 4;
-					offsetMP = offsetMP + 1;
+					offsetMP    = offsetMP    + 1;
 					if (offsetMP == BLOCK_WORDS) begin
 						next_state = MEM_WAIT;
 					end
