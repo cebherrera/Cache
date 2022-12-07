@@ -200,10 +200,10 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 	reg [7:0] state, next_state;
 
 	parameter IDLE        = 1;
-        parameter READ        = 2;
-        parameter WRITE       = 4;
-        parameter MEM_ACCESS  = 8;
-        parameter WRITE_BACK  = 16;
+	parameter READ        = 2;
+	parameter WRITE       = 4;
+	parameter MEM_ACCESS  = 8;
+	parameter WRITE_BACK  = 16;
 	parameter MEM_WAIT    = 32;
 
 	initial next_state    = IDLE;
@@ -313,12 +313,9 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 			MEM_ACCESS: begin
 				mem_wstrb_MP = 0;
 				mem_valid_MP = 1;
-				if (mem_ready_MP) begin
-					// Se debe traer todo el bloque
-					data[index][(offsetMP)*32+:32] = mem_rdata_MP;
-					offsetMP    = offsetMP    + 1;
-					mem_addr_MP = mem_addr_MP + 4;
-					if (offsetMP == BLOCK_WORDS) begin
+				if (offsetMP == BLOCK_WORDS-1) begin
+					if (mem_ready_MP)begin
+						data[index][(offsetMP)*32+:32] = mem_rdata_MP;
 						valid[index] = 1;  
 						dirty[index] = 0; 
 						tag  [index] = tag_w;   
@@ -330,6 +327,12 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 							next_state = READ;
 						end
 					end
+				end
+				else if (mem_ready_MP) begin
+					// Se debe traer todo el bloque
+					data[index][(offsetMP)*32+:32] = mem_rdata_MP;
+					offsetMP    = offsetMP    + 1;
+					mem_addr_MP = mem_addr_MP + 4;
 				end 
 			end
 			MEM_WAIT: begin
@@ -342,12 +345,13 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 				mem_valid_MP = 1; 
 				mem_wstrb_MP = 4'hF;
 				mem_wdata_MP = data[index][(offsetMP)*32+:32];
-				if (mem_ready_MP) begin
+
+				if (offsetMP == BLOCK_WORDS-1) begin
+					if (mem_ready_MP) next_state = MEM_WAIT;
+				end
+				else if (mem_ready_MP) begin
 					mem_addr_MP = mem_addr_MP + 4;
 					offsetMP    = offsetMP    + 1;
-					if (offsetMP == BLOCK_WORDS) begin
-						next_state = MEM_WAIT;
-					end
 				end
 			end
 		endcase
