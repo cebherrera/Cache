@@ -71,7 +71,10 @@ module system (
 		.mem_valid_MP(mem_valid_MP),
 		.mem_ready_MP(mem_ready_delay),
 		.mem_addr_MP(mem_addr_MP ),
-		.mem_instr_MP(mem_instr_MP)
+		.mem_instr_MP(mem_instr_MP),
+		.out_byte       (out_byte       ),
+		.out_byte_en    (out_byte_en    ),
+		.num_to_screen  (num_to_screen )
 	);
 
 	mem_prin principal (
@@ -89,10 +92,7 @@ module system (
 		.mem_la_write   (mem_la_write_MP   ),
 		.mem_la_addr    (mem_la_addr    ),
 		.mem_la_wdata   (mem_la_wdata   ),
-		.mem_la_wstrb   (mem_la_wstrb   ),
-		.out_byte       (out_byte       ),
-		.out_byte_en    (out_byte_en    ),
-		.num_to_screen  (num_to_screen )
+		.mem_la_wstrb   (mem_la_wstrb   )
 	);
 
 	clock_divider clkk (
@@ -222,16 +222,24 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 		case (state)
 		// COMIENZA ESTADO IDLE
 			IDLE: begin
-				hit_flag  = 0;
-				miss_flag = 0;
-				mem_ready = 0; 
-				if (mem_valid && w_mem_address != mem_addr) begin
-					w_mem_address = mem_addr;
-					if (|mem_wstrb) begin
-						next_state = WRITE;
-					end 
-					else if (!mem_wstrb) begin
-						next_state = READ;
+				if (mem_addr == 32'h1000_0000) begin
+					out_byte_en = 1;
+					out_byte = mem_wdata;
+					num_to_screen = mem_wdata;
+					mem_ready = 1;
+				end
+				else begin
+					hit_flag  = 0;
+					miss_flag = 0;
+					mem_ready = 0; 
+					if (mem_valid && w_mem_address != mem_addr) begin
+						w_mem_address = mem_addr;
+						if (|mem_wstrb) begin
+							next_state = WRITE;
+						end 
+						else if (!mem_wstrb) begin
+							next_state = READ;
+						end
 					end
 				end
 			end
@@ -451,7 +459,7 @@ module mem_prin (
 				mem_valid && !mem_ready && |mem_wstrb && mem_addr == 32'h1000_0000: begin
 						out_byte_en <= 1;
 						out_byte <= mem_wdata;
-						num_to_screen <= mem_la_wdata;
+						num_to_screen <= mem_wdata;
 						mem_ready <= 1;
 				end
 			endcase
