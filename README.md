@@ -1,43 +1,35 @@
-# UCR IE-0424 - Lab-6 Cache
+# Cache System Design - Lab-6
 
-This repository is the starting code for the lab exercises from the course
-IE-0424 (Digital Circuits Laboratory I) from the University of Costa Rica.
+Welcome to the Cache System Design for Lab-6 of the UCR IE-0424 course! This repository provides Verilog code for implementing a cache system that interfaces with a RISC-V CPU (picorv32), a memory unit (mem_prin), and a seven-segment display (seven_segment_hex) on a Nexys 4 DDR (or Nexys A7) FPGA board.
 
-The course makes use of the following elements:
+## System Overview
 
-* picorv32: A small implementation of a RISC-V CPU.
-* The [Nexys 4 DDR](https://reference.digilentinc.com/reference/programmable-logic/nexys-4-ddr/start)
-  board.
-  * This board is now replaced by the Nexys A7.
-  * This is a board with a Xilinx Artix-7 FPGA.
-* Vagrant using Docker as provider for firmware compilation.
- * In this project vagrant is set up to create a container with the required
-   32 bit RISC-V toolchain.
+The cache system is designed to work with the following components:
 
-## picorv32
+- **picorv32**: A RISC-V CPU core.
+- **mem_prin**: A memory unit responsible for memory read and write operations.
+- **seven_segment_hex**: A seven-segment display interface.
+- **clock_divider**: A clock divider module for generating a slower clock.
 
-This project uses a small implementation of a RISC-V CPU called
-[picorv32](https://github.com/cliffordwolf/picorv32).
+## Cache Direct-Mapped Implementation
 
-This implementation from Claire Wolf is present as a 
-[Git subtree](https://www.atlassian.com/blog/git/alternatives-to-git-submodule-git-subtree)
-in the `src/picorv32` folder of this project.
+The `cache_directo` module represents a direct-mapped cache with the following features:
 
-## Scripts usage
+- Tag, index, and offset calculation for address decoding.
+- Handling of cache read and write operations (hit and miss cases).
+- Dirty bit management for write-back operations.
 
-This scripts allows to create a Vivado project from scratch.
+## Memory Principal (mem_prin)
 
-```bash
-cd tools/scripts
+The `mem_prin` module simulates memory access and control, providing the following functionalities:
 
-# Creates project and allows to run sysnthesis, implementation and bitsteam generation.
-./create_project.sh -ic -ir
+- Simulation of memory read and write operations.
+- Control over memory access timings and responses.
 
-# Programs device (should be connected to the PC and turned on)
-# The bitstream must have been created previously.
-./create_project.sh -ip
+## Seven-Segment Display (seven_segment_hex)
 
-# Opens Vivado (assumes vivado is in the PATH)
-vivado &
-```
+The `seven_segment_hex` module interfaces with a seven-segment display to show hexadecimal output. It is used to display data from the cache.
 
+## Clock Divider (clock_divider)
+
+The `clock_divider` module generates a slower clock signal from the main clock, which is used for driving the seven-segment display. This helps to slow down display updates for better visibility.
