@@ -215,6 +215,14 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
         end
 	else begin
 	    state     <= next_state;
+		if (state == IDLE) begin
+			if (mem_addr == 32'h1000_0000) begin
+				out_byte_en   <= 1;
+				out_byte      <= mem_wdata;
+				num_to_screen <= mem_wdata;
+				mem_ready     <= 1;
+			end
+		end
 	   end
 	end
 
@@ -222,24 +230,16 @@ module cache_directo #( parameter CACHE_SIZE = 1024 , parameter BLOCK_BYTES = 8,
 		case (state)
 		// COMIENZA ESTADO IDLE
 			IDLE: begin
-				if (mem_addr == 32'h1000_0000) begin
-					out_byte_en   = 1;
-					out_byte      = mem_wdata;
-					num_to_screen = mem_wdata;
-					mem_ready     = 1;
-				end
-				else begin
-					hit_flag  = 0;
-					miss_flag = 0;
-					mem_ready = 0; 
-					if (mem_valid && w_mem_address != mem_addr) begin
-						w_mem_address = mem_addr;
-						if (|mem_wstrb) begin
-							next_state = WRITE;
-						end 
-						else if (!mem_wstrb) begin
-							next_state = READ;
-						end
+				hit_flag  = 0;
+				miss_flag = 0;
+				mem_ready = 0; 
+				if (mem_valid && w_mem_address != mem_addr) begin
+					w_mem_address = mem_addr;
+					if (|mem_wstrb) begin
+						next_state = WRITE;
+					end 
+					else if (!mem_wstrb) begin
+						next_state = READ;
 					end
 				end
 			end
