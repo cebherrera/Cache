@@ -1,4 +1,4 @@
-# UCR IE-0424
+# UCR IE-0424 - Lab-6: Cache
 
 This repository is the starting code for the lab exercises from the course
 IE-0424 (Digital Circuits Laboratory I) from the University of Costa Rica.
